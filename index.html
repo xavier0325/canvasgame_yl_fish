@@ -1,0 +1,807 @@
+<!-- 大鱼要给小鱼喂果实保持小鱼生命
+蓝色果实双倍分数
+每次改变屏幕大小需要手动刷新或者点重新开始以适应屏幕
+good luck! -->
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover,user-scalable=0" />
+		<meta name="keywords" content="canvas,game,前端网页游戏" />
+		<meta name="description" content="canvas游戏：芋泥的鱼，个人前端网页游戏" />
+		<meta name="author" content="Xavier" />
+		<title>芋泥的鱼</title>
+		<link rel="icon" href="./favicon.ico" / type="image/x-icon">
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+			}
+
+			body {
+				overflow: hidden;
+			}
+
+			ul,
+			li {
+				list-style: none;
+			}
+
+			@font-face {
+				font-family: myFont;
+				src: local("font/bangbangtang.ttf"), url("font/bangbangtang.ttf");
+			}
+
+			.leave {
+				display: none;
+			}
+
+			/* 游戏名字父容器 */
+			#gamenamebox {
+				width: 60%;
+				position: absolute;
+				top: 0;
+				left: 50%;
+				-webkit-transform: translateX(-50%);
+				-ms-transform: translateX(-50%);
+				transform: translateX(-50%);
+				-webkit-transition: display 3s linear;
+				-o-transition: display 3s linear;
+				transition: display 3s linear;
+				-webkit-transition-delay: 2s;
+				-o-transition-delay: 2s;
+				transition-delay: 2s;
+				z-index: 5;
+				background-color: transparent;
+				overflow: hidden;
+			}
+
+
+			/* 游戏名字移出场景 */
+			.gamenameboxleave {
+				-webkit-transform: translateY(-100px) !important;
+				-ms-transform: translateY(-100px) !important;
+				transform: translateY(-100px) !important;
+			}
+
+			#gamename {
+				width: 100%;
+				height: 115px;
+				display: -webkit-box;
+				display: -ms-flexbox;
+				display: flex;
+				z-index: 4;
+				-ms-flex-pack: distribute;
+				justify-content: space-around;
+				-webkit-transition: -webkit-transform 1s ease-in-out;
+				transition: -webkit-transform 1s ease-in-out;
+				-o-transition: transform 1s ease-in-out;
+				transition: transform 1s ease-in-out;
+				transition: transform 1s ease-in-out, -webkit-transform 1s ease-in-out;
+			}
+
+			/* 每个字的容器 */
+			#gamenamebox #gamename .box {
+				width: 25%;
+				float: left;
+				padding-top: 47px;
+				font-family: myFont;
+				color: white;
+				text-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+				position: relative;
+				text-align: center;
+				font-size: 50px;
+				font-weight: bold;
+				z-index: 10;
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+
+			/* 单独操作每个字 */
+			#gamenamebox #gamename .box:nth-child(1) p {
+				-webkit-transform-origin: 50% 0;
+				-ms-transform-origin: 50% 0;
+				transform-origin: 50% 0;
+				-webkit-animation: nameframes 5s ease-in-out 0s infinite;
+				animation: nameframes 5s ease-in-out 0s infinite;
+			}
+
+			#gamenamebox #gamename .box:nth-child(2) p {
+				-webkit-transform-origin: 50% 0;
+				-ms-transform-origin: 50% 0;
+				transform-origin: 50% 0;
+				-webkit-animation: nameframes 5s ease-in-out .4s infinite;
+				animation: nameframes 5s ease-in-out .4s infinite;
+			}
+
+			#gamenamebox #gamename .box:nth-child(3) p {
+				-webkit-transform-origin: 50% 0;
+				-ms-transform-origin: 50% 0;
+				transform-origin: 50% 0;
+				-webkit-animation: nameframes 5s ease-in-out .8s infinite;
+				animation: nameframes 5s ease-in-out .8s infinite;
+			}
+
+			#gamenamebox #gamename .box:nth-child(4) p {
+				-webkit-transform-origin: 50% 0;
+				-ms-transform-origin: 50% 0;
+				transform-origin: 50% 0;
+				-webkit-animation: nameframes 5s ease-in-out 1.2s infinite;
+				animation: nameframes 5s ease-in-out 1.2s infinite;
+			}
+
+			/* 字的绳索 */
+			#gamenamebox #gamename .box span {
+				content: '';
+				width: 90px;
+				height: 10px;
+				background-color: red;
+				position: absolute;
+				top: 0;
+				left: 50%;
+				margin-top: -30px;
+				-webkit-box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.8);
+				box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.8);
+				-webkit-transform-origin: 0 50%;
+				-ms-transform-origin: 0 50%;
+				transform-origin: 0 50%;
+				-webkit-transform: rotate(90deg);
+				-ms-transform: rotate(90deg);
+				transform: rotate(90deg);
+				z-index: -1;
+			}
+
+			/* 单独操作每个字的容器 */
+			#gamenamebox #gamename .box:nth-child(1) {
+				-webkit-transition: -webkit-transform .8s ease-in-out;
+				transition: -webkit-transform .8s ease-in-out;
+				-o-transition: transform .8s ease-in-out;
+				transition: transform .8s ease-in-out;
+				transition: transform .8s ease-in-out, -webkit-transform .8s ease-in-out;
+				-webkit-transition-delay: 0.2s;
+				-o-transition-delay: 0.2s;
+				transition-delay: 0.2s;
+			}
+
+			#gamenamebox #gamename .box:nth-child(2) {
+				-webkit-transition: -webkit-transform .8s ease-in-out;
+				transition: -webkit-transform .8s ease-in-out;
+				-o-transition: transform .8s ease-in-out;
+				transition: transform .8s ease-in-out;
+				transition: transform .8s ease-in-out, -webkit-transform .8s ease-in-out;
+				-webkit-transition-delay: 0.4s;
+				-o-transition-delay: 0.4s;
+				transition-delay: 0.4s;
+			}
+
+			#gamenamebox #gamename .box:nth-child(3) {
+				-webkit-transition: -webkit-transform .8s ease-in-out;
+				transition: -webkit-transform .8s ease-in-out;
+				-o-transition: transform .8s ease-in-out;
+				transition: transform .8s ease-in-out;
+				transition: transform .8s ease-in-out, -webkit-transform .8s ease-in-out;
+				-webkit-transition-delay: 0.6s;
+				-o-transition-delay: 0.6s;
+				transition-delay: 0.6s;
+			}
+
+			#gamenamebox #gamename .box:nth-child(4) {
+				-webkit-transition: -webkit-transform .8s ease-in-out;
+				transition: -webkit-transform .8s ease-in-out;
+				-o-transition: transform .8s ease-in-out;
+				transition: transform .8s ease-in-out;
+				transition: transform .8s ease-in-out, -webkit-transform .8s ease-in-out;
+				-webkit-transition-delay: 0.8s;
+				-o-transition-delay: 0.8s;
+				transition-delay: 0.8s;
+			}
+
+			/* 每个字的绳索样式 */
+			#gamenamebox #gamename .box:nth-child(1) span {
+				background-image: -webkit-gradient(linear, left top, left bottom, from(#a1c4fd), to(#c2e9fb));
+				background-image: -o-linear-gradient(top, #a1c4fd 0%, #c2e9fb 100%);
+				background-image: linear-gradient(to bottom, #a1c4fd 0%, #c2e9fb 100%);
+				opacity: 0.8;
+			}
+
+			#gamenamebox #gamename .box:nth-child(2) span {
+				background-image: -webkit-gradient(linear, left top, left bottom, from(#a8edea), to(#fed6e3));
+				background-image: -o-linear-gradient(top, #a8edea 0%, #fed6e3 100%);
+				background-image: linear-gradient(to bottom, #a8edea 0%, #fed6e3 100%);
+				opacity: 0.8;
+			}
+
+			#gamenamebox #gamename .box:nth-child(3) span {
+				background-image: -webkit-gradient(linear, left top, left bottom, from(#e4afcb), color-stop(0%, #b8cbb8), color-stop(0%, #b8cbb8), color-stop(30%, #e2c58b), color-stop(64%, #c2ce9c), to(#7edbdc));
+				background-image: -o-linear-gradient(top, #e4afcb 0%, #b8cbb8 0%, #b8cbb8 0%, #e2c58b 30%, #c2ce9c 64%, #7edbdc 100%);
+				background-image: linear-gradient(to bottom, #e4afcb 0%, #b8cbb8 0%, #b8cbb8 0%, #e2c58b 30%, #c2ce9c 64%, #7edbdc 100%);
+				opacity: 0.8;
+			}
+
+			#gamenamebox #gamename .box:nth-child(4) span {
+				background-image: -webkit-gradient(linear, left top, left bottom, from(#ebc0fd), to(#d9ded8));
+				background-image: -o-linear-gradient(top, #ebc0fd 0%, #d9ded8 100%);
+				background-image: linear-gradient(to bottom, #ebc0fd 0%, #d9ded8 100%);
+			}
+
+			/* 彩蛋 */
+			#coloregg {
+				position: relative;
+			}
+
+			#gamenamebox #gamename .box i.love {
+				display: none;
+				content: '';
+				width: 37px;
+				height: 32px;
+				background: url(img/love.png);
+				position: absolute;
+				bottom: 50%;
+				left: calc(50% - 18px);
+				z-index: 11;
+				-webkit-animation: loveframs 4s linear 0s infinite;
+				animation: loveframs 4s linear 0s infinite;
+			}
+
+			/* 爱心动画 */
+			@keyframes loveframs {
+				0% {
+					left: calc(50% - 18px);
+				}
+
+				25% {
+					left: calc(75% - 18px);
+					bottom: 30%;
+				}
+
+				50% {
+					left: calc(50% - 18px);
+					bottom: -5px;
+				}
+
+				75% {
+					left: calc(28% - 18px);
+					bottom: 30%;
+				}
+
+				100% {
+					left: calc(50% - 18px);
+					,
+					bottom: 50%;
+				}
+			}
+
+			/* 名字摇摆动画 */
+			@-webkit-keyframes nameframes {
+				0% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				5% {
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				10% {
+
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				15% {
+
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				20% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				25% {
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				30% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				35% {
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				40%,
+				65% {
+					-webkit-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+
+				70% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				75% {
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				80% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				85% {
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				90% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				95% {
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				100% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+			}
+
+			@keyframes nameframes {
+				0% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				5% {
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				10% {
+
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				15% {
+
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				20% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				25% {
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				30% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				35% {
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				40%,
+				65% {
+					-webkit-transform: rotate(0deg);
+					transform: rotate(0deg);
+				}
+
+				70% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				75% {
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				80% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				85% {
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				90% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+				95% {
+					-webkit-transform: rotate(-6deg);
+					transform: rotate(-6deg);
+				}
+
+				100% {
+					-webkit-transform: rotate(6deg);
+					transform: rotate(6deg);
+				}
+
+			}
+
+			/* 开始游戏按钮容器 */
+			#startgamecontainer {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				-webkit-transform: translateX(-50%);
+				-ms-transform: translateX(-50%);
+				transform: translateX(-50%);
+				z-index: 10;
+			}
+
+			/* 开始游戏按钮 */
+			#startgame {
+				position: relative;
+				text-decoration: none;
+				padding: 15px 25px;
+				border: 2px solid #00d0be;
+				border-radius: 10%;
+				font-family: myFont;
+				font-size: 20px;
+				color: white;
+				font-weight: 600;
+				letter-spacing: 5px;
+				cursor: pointer;
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+				-webkit-transition: all .5s;
+				-o-transition: all .5s;
+				transition: all .5s;
+			}
+
+			/* 按钮前面的线条 */
+			#startgamecontainer #startgame::before {
+				content: "";
+				position: absolute;
+				left: -20px;
+				top: 50%;
+				-webkit-transform: translateY(-50%);
+				-ms-transform: translateY(-50%);
+				transform: translateY(-50%);
+				background: #00d0be;
+				width: 20px;
+				height: 2px;
+				-webkit-box-shadow: 5px -8px 0 #00d0be,
+					5px 8px 0 #00d0be;
+				box-shadow: 5px -8px 0 #00d0be,
+					5px 8px 0 #00d0be;
+				-webkit-transition: width 0.5s, height 0.5s, left 0.5s,
+					-webkit-box-shadow 0.5s;
+				transition: width 0.5s, height 0.5s, left 0.5s,
+					-webkit-box-shadow 0.5s;
+				-o-transition: width 0.5s, height 0.5s, left 0.5s,
+					box-shadow 0.5s;
+				transition: width 0.5s, height 0.5s, left 0.5s,
+					box-shadow 0.5s;
+				transition: width 0.5s, height 0.5s, left 0.5s,
+					box-shadow 0.5s, -webkit-box-shadow 0.5s;
+				-webkit-transition-delay: 0s, 1s, 0s, 0.5s;
+				-o-transition-delay: 0s, 1s, 0s, 0.5s;
+				transition-delay: 0s, 1s, 0s, 0.5s;
+			}
+
+			/* 按钮后面的线条 */
+			#startgamecontainer #startgame::after {
+				content: "";
+				position: absolute;
+				right: -20px;
+				top: 50%;
+				-webkit-transform: translateY(-50%);
+				-ms-transform: translateY(-50%);
+				transform: translateY(-50%);
+				background: #00d0be;
+				width: 20px;
+				height: 2px;
+				-webkit-box-shadow: -5px -8px 0 #00d0be,
+					-5px 8px 0 #00d0be;
+				box-shadow: -5px -8px 0 #00d0be,
+					-5px 8px 0 #00d0be;
+				-webkit-transition: width 0.5s, height 0.5s, right 0.5s,
+					-webkit-box-shadow 0.5s;
+				transition: width 0.5s, height 0.5s, right 0.5s,
+					-webkit-box-shadow 0.5s;
+				-o-transition: width 0.5s, height 0.5s, right 0.5s,
+					box-shadow 0.5s;
+				transition: width 0.5s, height 0.5s, right 0.5s,
+					box-shadow 0.5s;
+				transition: width 0.5s, height 0.5s, right 0.5s,
+					box-shadow 0.5s, -webkit-box-shadow 0.5s;
+				-webkit-transition-delay: 0s, 1s, 0s, 0.5s;
+				-o-transition-delay: 0s, 1s, 0s, 0.5s;
+				transition-delay: 0s, 1s, 0s, 0.5s;
+			}
+
+			#startgamecontainer #startgame:active {
+				background-image: -webkit-gradient(linear, left top, right top, from(rgba(161, 196, 253, 0.4)), to(rgba(194, 233, 251, 0.4)));
+				background-image: -o-linear-gradient(left, rgba(161, 196, 253, 0.4), rgba(194, 233, 251, 0.4));
+				background-image: linear-gradient(to right, rgba(161, 196, 253, 0.4), rgba(194, 233, 251, 0.4));
+				-webkit-box-shadow: 0 0 2px 2px rgba(255, 255, 255, 0.8);
+				box-shadow: 0 0 2px 2px rgba(255, 255, 255, 0.8);
+				font-size: 21px;
+			}
+
+			#startgamecontainer #startgame:active::before {
+				width: 45px;
+				height: 2px;
+				left: -32px;
+				-webkit-box-shadow: 0 0 0 #00d0be,
+					0 0 0 #00d0be;
+				box-shadow: 0 0 0 #00d0be,
+					0 0 0 #00d0be;
+			}
+
+			#startgamecontainer #startgame:active::after {
+				width: 45px;
+				height: 2px;
+				right: -32px;
+				-webkit-box-shadow: 0 0 0 #00d0be,
+					0 0 0 #00d0be;
+				box-shadow: 0 0 0 #00d0be,
+					0 0 0 #00d0be;
+			}
+
+			#startgamecontainer #startgame:hover {
+				background-image: -webkit-gradient(linear, left top, right top, from(rgba(161, 196, 253, 0.4)), to(rgba(194, 233, 251, 0.4)));
+				background-image: -o-linear-gradient(left, rgba(161, 196, 253, 0.4), rgba(194, 233, 251, 0.4));
+				background-image: linear-gradient(to right, rgba(161, 196, 253, 0.4), rgba(194, 233, 251, 0.4));
+				-webkit-box-shadow: 0 0 2px 2px rgba(255, 255, 255, 0.8);
+				box-shadow: 0 0 2px 2px rgba(255, 255, 255, 0.8);
+				font-size: 21px;
+			}
+
+			#startgamecontainer #startgame:hover::before {
+				width: 45px;
+				height: 2px;
+				left: -32px;
+				-webkit-box-shadow: 0 0 0 #00d0be,
+					0 0 0 #00d0be;
+				box-shadow: 0 0 0 #00d0be,
+					0 0 0 #00d0be;
+			}
+
+			#startgamecontainer #startgame:hover::after {
+				width: 45px;
+				height: 2px;
+				right: -32px;
+				-webkit-box-shadow: 0 0 0 #00d0be,
+					0 0 0 #00d0be;
+				box-shadow: 0 0 0 #00d0be,
+					0 0 0 #00d0be;
+			}
+
+			/* 游戏场景 */
+			/* .all_bg{margin: 0 auto;} */
+			#allcanvas {
+				position: relative;
+				margin: 0;
+				overflow: hidden;
+			}
+
+			/* 设置 */
+			#setting {
+				position: absolute;
+				top: 0;
+				left: -25px;
+				z-index: 3;
+				background: transparent;
+			}
+
+			#setting ul {
+				-webkit-transition: all .3s ease-in-out;
+				-o-transition: all .3s ease-in-out;
+				transition: all .3s ease-in-out;
+			}
+
+			#setting li {
+				position: absolute;
+				top: 20px;
+				left: 0;
+				width: 50px;
+				height: 50px;
+				text-align: center;
+				line-height: 50px;
+				background: rgba(0, 208, 190, 0.8);
+				-webkit-box-shadow: 0 0 2px 1px rgba(255, 255, 255, 0.8);
+				box-shadow: 0 0 2px 1px rgba(255, 255, 255, 0.8);
+				border-radius: 0 25px 25px 0;
+				-webkit-transition: all .5s ease-in-out;
+				-o-transition: all .5s ease-in-out;
+				transition: all .5s ease-in-out;
+			}
+
+			.icon-sound-on {
+				display: block;
+				width: 40px;
+				height: 40px;
+				margin-top: 7px;
+				margin-right: 6px;
+				background-size: 100% 100%;
+				background-image: url(img/bgmusic-on.png);
+			}
+
+			.icon-sound-off {
+				display: block;
+				width: 40px;
+				height: 40px;
+				margin-top: 7px;
+				margin-right: 6px;
+				background-size: 100% 100%;
+				background-image: url(img/bgmusic-off.png);
+			}
+
+			.li-hover {
+				-webkit-box-shadow: 0 0 2px 3px rgba(255, 255, 255, 0.8) !important;
+				box-shadow: 0 0 2px 3px rgba(255, 255, 255, 0.8) !important;
+				background-image: -webkit-gradient(linear, left top, left bottom, from(#008752), to(#007849)) !important;
+				background-image: -o-linear-gradient(#008752, #007849) !important;
+				background-image: linear-gradient(#008752, #007849) !important;
+			}
+
+			/* 重新开始 */
+			/* #setting li:last-child{line-height: 80px;} */
+			#restartBtn {
+				display: none;
+				width: 64px;
+				height: 64px;
+				position: absolute;
+				top: 50%;
+				left: calc(50% - 32px);
+				z-index: 3;
+				outline: none;
+				border: none;
+				border-radius: 32px;
+				background: rgba(255, 255, 255, 0.8);
+				-webkit-box-shadow: 0 0 2px 3px rgba(255, 255, 255, 0.8);
+				box-shadow: 0 0 2px 3px rgba(255, 255, 255, 0.8);
+				-webkit-transition: all 0.3s ease-in-out;
+				-o-transition: all 0.3s ease-in-out;
+				transition: all 0.3s ease-in-out;
+			}
+
+			#restartBtn:active {
+				-webkit-transform: translateY(6px);
+				-ms-transform: translateY(6px);
+				transform: translateY(6px);
+				background-image: -webkit-gradient(linear, left top, left bottom, from(#008752), to(#007849));
+				background-image: -o-linear-gradient(#008752, #007849);
+				background-image: linear-gradient(#008752, #007849);
+			}
+
+			/* 画布1 */
+			#canvas1 {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				z-index: 1;
+			}
+
+			/* 画布二 */
+			#canvas2 {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				z-index: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<audio id="audio" src="./sounds/bgmusic1.mp3" loop autoplay></audio>
+		<!-- <div class="all_bg" > -->
+		<!-- 游戏名字 -->
+		<div id="gamenamebox">
+			<div id="gamename">
+				<div class="box"><span></span>
+					<p>芋</p>
+				</div>
+				<div class="box"><span></span>
+					<p>泥</p>
+				</div>
+				<div class="box"><span></span>
+					<p>的</p>
+				</div>
+				<div class="box"><span></span>
+					<p id="coloregg">鱼</p><i class="love"></i>
+				</div>
+			</div>
+		</div>
+		<!-- 开始游戏按钮 -->
+		<div id="startgamecontainer">
+			<a id="startgame" onclick="startGame()"><span>开始游戏</span></a>
+		</div>
+		<!-- 游戏场景 -->
+		<div id="allcanvas">
+			<!-- 设置 -->
+			<div id="setting">
+
+				<ul>
+					<li id="setting0" onclick="setting()" style="z-index: 5;">
+						<!-- <span> -->
+						<svg t="1627361121728" class="icon" viewBox="0 0 1709 1024" version="1.1"
+							xmlns="http://www.w3.org/2000/svg" p-id="871" width="48" height="48">
+							<path
+								d="M1334.81803 367.324421c-43.813778-9.764213-80.366986-37.053938-102.774604-76.861884-22.908347-40.55904-27.665271-88.378649-13.144133-131.31615 6.133929-17.901058-1.251822-37.679849-17.525511-47.31888L1021.612112 5.547801c-16.649235-9.764213-37.679849-6.384293-50.448436 8.136844-30.544462 34.800658-72.230142 53.953538-117.295742 53.953538-45.941875 0-87.377191-19.027698-116.795012-53.577991-12.643404-14.771502-34.049564-18.401787-50.823982-8.512391L506.487269 111.702325c-16.273689 9.639031-23.65944 29.417822-17.525511 47.31888 14.521138 42.937502 9.764213 90.757111-13.144133 131.31615-22.5328 39.682764-58.960826 66.972489-102.774604 76.861884-18.151422 4.131013-31.170373 20.27952-31.170373 39.056853v213.686053c0 18.652151 13.018951 34.92584 31.170373 39.056853 43.688595 9.764213 80.241804 37.053938 102.774604 76.861884 21.906889 39.557582 27.03936 86.626097 14.020409 129.188053-5.382836 17.650693 2.002916 36.678391 17.901057 46.067058L689.754042 1018.397157c16.398871 9.764213 37.429484 6.509476 50.072888-7.761298 29.042275-32.297013 70.727955-50.949164 114.291369-50.949164s85.123911 18.526969 114.291368 50.949164c7.761298 8.762756 18.777333 13.269316 29.793369 13.269315 7.010204 0 14.020409-1.752551 20.27952-5.758382L1200.497506 910.865628c15.898142-9.263484 23.283893-28.291182 18.02624-45.941875-13.144133-43.688595-8.136844-89.630471 13.895227-129.438417 22.5328-39.682764 58.960826-66.972489 102.774604-76.861885 18.151422-4.131013 31.170373-20.27952 31.170373-39.056853V406.381275c-0.250364-18.777333-13.144133-34.92584-31.54592-39.056854z m-31.54592 225.828728c-21.40616 8.136844-41.68568 19.15288-60.33783 32.922925-27.915635 20.780249-50.823982 46.943333-68.224311 77.738159 0 0.125182-0.125182 0.250364-0.125182 0.375547-16.774418 30.168915-27.164542 62.841475-30.920009 97.016222-2.628827 23.409075-2.002916 46.818151 1.877733 69.85168l-135.82271 80.241804c-43.438231-36.177662-98.518409-56.457182-155.726684-56.457182s-112.413635 20.27952-155.977049 56.582364l-135.697528-80.116622c9.388667-56.582364-0.751093-115.918737-29.042275-166.742719 0-0.125182-0.125182-0.250364-0.125183-0.250365-17.400329-30.794827-40.308675-56.957911-68.22431-77.738159-18.652151-13.895227-38.806489-24.911262-60.337831-32.922925v-160.233243c21.531342-8.136844 41.810862-19.278062 60.337831-32.922925 27.915635-20.780249 50.823982-46.943333 68.22431-77.738159 29.793369-52.701715 39.682764-113.289911 28.791911-170.998915l132.067244-78.113707c17.400329 15.147049 36.678391 27.790453 57.959369 37.429485 31.921467 14.64632 66.221395 22.032071 101.898328 22.032071 59.461555 0 115.042462-21.030613 159.607333-59.71192l132.317609 78.238888c-10.765671 57.709004-0.876276 118.547564 28.791911 170.998915 17.400329 30.669644 40.308675 56.832729 68.22431 77.612978 18.652151 13.895227 38.806489 24.911262 60.337831 32.922924v159.982879z"
+								fill="#333333" p-id="872"></path>
+							<path
+								d="M1098.599178 367.449604c-22.657982-40.058311-30.294098-86.500915-22.032071-130.439875l-101.022053-59.71192c-33.924382 29.543004-76.361155 45.566329-121.802302 45.566329-27.289724 0-53.452809-5.6332-77.738159-16.774418-16.148507-7.385751-30.920009-17.024782-44.189325-28.541547L631.04358 237.134911c8.387209 44.064142 0.751093 90.381564-22.032071 130.565057-13.144133 23.283893-30.669644 43.187866-51.950622 59.086009-14.145591 10.515307-29.543004 18.902515-46.067058 25.161626v122.303031c16.398871 6.133929 31.796284 14.521138 46.067058 25.161627 21.280978 15.898142 38.806489 35.802115 52.075804 59.336373 0 0.125182 0.125182 0.125182 0.125182 0.250364 21.531342 38.806489 29.29264 84.122453 22.157253 127.185137l103.65088 61.088925c33.298471-27.665271 75.359697-43.187866 119.048293-43.187867 43.688595 0 85.749822 15.522595 118.797928 43.062684l103.65088-61.214106c-2.879191-17.525511-3.37992-35.426569-1.377005-53.202444 2.879191-26.163084 10.765671-51.074346 23.534258-74.107876 0-0.125182 0.125182-0.125182 0.125182-0.250364 13.269316-23.534258 30.794827-43.438231 52.075805-59.336373 14.270773-10.515307 29.668187-19.027698 46.067057-25.161627v-122.177848c-16.398871-6.133929-31.796284-14.521138-46.067057-25.161627-21.531342-15.77296-39.056853-35.676933-52.326169-59.086008z"
+								fill="#61C6F1" p-id="873"></path>
+							<path
+								d="M853.867934 362.567497c-81.368444 0-147.589839 67.723582-147.589839 150.969759 0 82.870631 66.221395 150.218666 147.589839 150.218667S1001.457774 596.032341 1001.457774 512.786163c0-82.745449-66.221395-150.218666-147.58984-150.218666z"
+								fill="#333333" p-id="874"></path>
+						</svg>
+						<!-- </span> -->
+					</li>
+					<li id="setting1" style="z-index: 4;" onclick="restart()">
+						<!-- <span> -->
+						<svg t="1627298629985" class="icon" viewBox="0 0 1024 1024" version="1.1"
+							xmlns="http://www.w3.org/2000/svg" p-id="1375" width="48" height="48">
+							<path
+								d="M895.1296 485.888a384 384 0 1 0-149.9136 331.2128 25.6 25.6 0 0 1 31.1296 40.6528 435.2 435.2 0 1 1 168.9088-387.328l21.504-21.504a25.6 25.6 0 0 1 36.1984 36.1984l-72.3968 72.3968a25.4976 25.4976 0 0 1-36.1984 0l-72.3968-72.3968a25.6 25.6 0 0 1 36.1984-36.1984l36.9664 36.9664z m-225.0752-2.56a35.84 35.84 0 0 1 0 57.344l-177.5104 133.12a35.84 35.84 0 0 1-57.344-28.672V378.88a35.84 35.84 0 0 1 57.344-28.672l177.5104 133.12zM486.4 409.6v204.8l136.5504-102.4L486.4 409.6z"
+								fill="#00d0be" p-id="1376"></path>
+						</svg>
+						<!-- </span> -->
+					</li>
+					<li id="setting2" style="z-index: 3;" onclick="soundtoggle()"><span class="icon-sound-on"></span>
+					</li>
+				</ul>
+			</div>
+			<!-- 重新开始按钮 -->
+			<button id="restartBtn" onclick="restart()">
+				<svg t="1627298629985" class="icon" viewBox="0 0 1024 1024" version="1.1"
+					xmlns="http://www.w3.org/2000/svg" p-id="1375" width="64" height="64">
+					<path
+						d="M895.1296 485.888a384 384 0 1 0-149.9136 331.2128 25.6 25.6 0 0 1 31.1296 40.6528 435.2 435.2 0 1 1 168.9088-387.328l21.504-21.504a25.6 25.6 0 0 1 36.1984 36.1984l-72.3968 72.3968a25.4976 25.4976 0 0 1-36.1984 0l-72.3968-72.3968a25.6 25.6 0 0 1 36.1984-36.1984l36.9664 36.9664z m-225.0752-2.56a35.84 35.84 0 0 1 0 57.344l-177.5104 133.12a35.84 35.84 0 0 1-57.344-28.672V378.88a35.84 35.84 0 0 1 57.344-28.672l177.5104 133.12zM486.4 409.6v204.8l136.5504-102.4L486.4 409.6z"
+						fill="#00d0be" p-id="1376"></path>
+				</svg>
+			</button>
+			<!-- 画布 -->
+			<canvas id="canvas1"></canvas>
+			<canvas id="canvas2"></canvas>
+		</div>
+		<!-- </div> -->
+		<script type="text/javascript" src="./js/main.js"></script>
+		<script type="text/javascript" src="./js/commonFunctions.js"></script>
+		<script type="text/javascript" src="./js/background.js"></script>
+		<script type="text/javascript" src="./js/ane.js"></script>
+		<script type="text/javascript" src="./js/fruit.js"></script>
+		<script type="text/javascript" src="./js/mom.js"></script>
+		<script type="text/javascript" src="./js/collision.js"></script>
+		<script type="text/javascript" src="./js/baby.js"></script>
+		<script type="text/javascript" src="./js/data.js"></script>
+		<script type="text/javascript" src="./js/wave.js"></script>
+		<script type="text/javascript" src="./js/halo.js"></script>
+		<script type="text/javascript" src="./js/dust.js"></script>
+
+	</body>
+</html>
